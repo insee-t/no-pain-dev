@@ -1,44 +1,15 @@
 local NoPain = {}
 local H = {}
 
+vim.opt.laststatus = 3
+
 NoPain.normal_primary = "#98C066"
 NoPain.normal_second = "#1C1C1C"
 NoPain.desc_bg = "#8A8A8A"
 NoPain.after_emoji_fg = "#3A3A3A"
 NoPain.after_emoji_bg = "#1C1C1C"
 
-NoPain.clues_normal = {
-    { next_key = 'hjkl', desc = '←↓↑→' },
-    { next_key = 'i', desc = 'INSERT' },
-    { next_key = 'v', desc = 'VISUAL' },
-    { next_key = ':', desc = 'COMMAND' },
-    { next_key = 'x', desc = 'Delete Char' },
-    { next_key = 'd', desc = 'Delete' },
-    { next_key = 'w', desc = 'W Forward' },
-    { next_key = '^ v', desc = 'Block' },
-}
-
-NoPain.clues_insert = {
-    { next_key = '󰘴 h', desc = 'Delete char' },
-    { next_key = '󰘴 w', desc = 'Delete word' },
-    { next_key = '󰘴 t', desc = 'Indent' },
-    { next_key = '󰘴 d', desc = 'Deindent' },
-    { next_key = '󰘴 x', desc = 'Completion' },
-    { next_key = '󰘴 r', desc = 'Register' },
-    { next_key = '󰘴 j', desc = 'Add line' },
-    { next_key = '󰘴 o', desc = 'Temp normal mode' },
-}
-
-NoPain.clues_visual = {
-    { next_key = 'y',  desc = 'yank' },
-    { next_key = 'c',  desc = 'change' },
-    { next_key = 'iw', desc = 'in word' },
-    { next_key = 'o',  desc = 'other end' },
-    { next_key = 'ap', desc = 'around par' },
-    { next_key = '{',  desc = 'prev empty' },
-}
-
-NoPain.create_clues_bar = function(clues)
+NoPain.create_clues_bar = function(clues, icon)
 
     local highlights = {
         { "AfterEmoji",  { fg = NoPain.after_emoji_fg, bg = NoPain.after_emoji_bg, bold = false } },
@@ -58,7 +29,7 @@ NoPain.create_clues_bar = function(clues)
     for _, hl in ipairs(highlights) do
         vim.api.nvim_set_hl(0, hl[1], hl[2])
     end
-    local clues_bar = "%#Inverse# 󰌵 %#Default#%#AfterEmoji2# %#AfterEmoji#"
+    local clues_bar = "%#Inverse# " .. icon .. " %#Default#%#AfterEmoji2# %#AfterEmoji#"
     for _, line_content in ipairs(clues) do
         clues_bar = clues_bar .. string.format(" %s%s %s%s %s %s%s",
             "%#Keys#", line_content.next_key, "%#Desc#", "",
@@ -66,6 +37,124 @@ NoPain.create_clues_bar = function(clues)
     end
     return clues_bar
 end
+
+NoPain.clues_normal = {
+  { next_key = 'i', desc = 'INSERT' },
+  { next_key = 'v', desc = 'VISUAL' },
+  { next_key = ':', desc = 'COMMAND' },
+  { next_key = 'x', desc = 'Delete Char' },
+  { next_key = 'd', desc = 'Delete' },
+  { next_key = 'w', desc = 'W Forward' },
+  { next_key = '^ v', desc = 'Block' },
+  { next_key = 'hjkl', desc = '←↓↑→' },
+}
+
+NoPain.clues_insert = {
+    { next_key = '󰘴 h', desc = 'Delete char' },
+    { next_key = '󰘴 w', desc = 'Delete word' },
+    { next_key = '󰘴 t', desc = 'Indent' },
+    { next_key = '󰘴 d', desc = 'Deindent' },
+    { next_key = '󰘴 x', desc = 'Completion' },
+    { next_key = '󰘴 r', desc = 'Register' },
+    { next_key = '󰘴 j', desc = 'Add line' },
+    { next_key = '󰘴 o', desc = 'Temp normal mode' },
+}
+
+NoPain.clues_visual = {
+  { next_key = 'y',  desc = 'yank' },
+  { next_key = 'c',  desc = 'change' },
+  { next_key = 'iw', desc = 'in word' },
+  { next_key = 'o',  desc = 'other end' },
+  { next_key = 'ap', desc = 'around par' },
+  { next_key = '{',  desc = 'prev empty' },
+}
+
+NoPain.clues_builtin_completion = {
+    { next_key = '󰘴 n', desc = 'Next' },               -- Next completion (very common)
+    { next_key = '󰘴 p', desc = 'Prev' },               -- Previous completion (very common)
+    { next_key = '󰘴 f', desc = 'File names' },         -- File path completion (useful in many contexts)
+    { next_key = '󰘴 l', desc = 'Whole lines' },        -- Line completion (useful for repetitive text)
+    { next_key = '󰘴 o', desc = 'Omni' },               -- Omni completion (language-specific, very powerful)
+    { next_key = '󰘴 k', desc = 'dict Identifiers' },   -- Dictionary completion (useful for writing)
+    { next_key = '󰘴 s', desc = 'Spell' },              -- Spell checking (important for writing)
+    { next_key = 's',     desc = 'Spell' },              -- Alternative spell checking
+    { next_key = '󰘴 i', desc = 'Identifiers' },        -- Identifier completion (useful for coding)
+}
+
+NoPain.clues_windows = {
+    -- Navigation (most frequently used)
+    { next_key = 'hjkl', desc = '←↓↑→'},
+    -- { next_key = 'w', desc = 'focus next'},
+    -- { next_key = 'p', desc = 'focus last'},
+
+    --next_indws (essential for multitasking)
+    { next_key = 's', desc = 'Split —' },
+    { next_key = 'v', desc = 'Split |' },
+    -- { next_key = 'q', desc = 'quit' },
+    { next_key = 'o', desc = 'Close others' },
+
+    --next_ndos (common for adjusting layout)
+    { next_key = 'HJKL', desc = 'Move ←↓↑→ most'},
+    { next_key = 'x', desc = 'Swap'},
+    -- { next_key = '+', desc = '+height'},
+    -- { next_key = '-', desc = '-height'},
+    { next_key = '>', desc = '+Width'},
+    { next_key = '<', desc = '-Width'},
+    { next_key = '=', desc = 'Same size' },
+    -- { next_key = 'n', desc = 'New' },
+    --next_', eys = '_', desc = 'set height' },
+    --next_', eys = '|', desc = 'set width' },
+
+    -- Closing and quitting (essential for cleanup)
+    -- { mode = 'n', keys = 'c', desc = 'close' },
+    -- { mode = 'n', keys = 'z', desc = 'close preview' },
+
+    -- Moving and rotating windows (useful for rearranging)
+    -- { mode = 'n', keys = '<C-w>r', desc = 'rotate ↓/→', postkeys = postkeys_move },
+    -- { mode = 'n', keys = '<C-w>R', desc = 'rotate ↑/←', postkeys = postkeys_move },
+    --
+    -- -- Tab management (useful for multitasking)
+    -- { mode = 'n', keys = '<C-w>T', desc = 'move to new tab' },
+    -- { mode = 'n', keys = '<C-w>gt', desc = 'focus next tab', postkeys = postkeys_navigate },
+    -- { mode = 'n', keys = '<C-w>gT', desc = 'focus prev tab', postkeys = postkeys_navigate },
+    -- { mode = 'n', keys = '<C-w>g<Tab>', desc = 'focus last tab', postkeys = postkeys_navigate },
+    --
+    -- -- Tag and file navigation (useful for coding)
+    -- { mode = 'n', keys = '<C-w>]', desc = 'split → tag' },
+    -- { mode = 'n', keys = '<C-w>}', desc = 'preview tag' },
+    -- { mode = 'n', keys = '<C-w>g]', desc = 'split → tag list' },
+    -- { mode = 'n', keys = '<C-w>g}', desc = ':ptjump' },
+    -- { mode = 'n', keys = '<C-w>g<C-]>', desc = 'split → :tjump' },
+    -- { mode = 'n', keys = '<C-w>f', desc = 'split → name+jump' },
+    -- { mode = 'n', keys = '<C-w>F', desc = 'split → edit+jump' },
+    -- { mode = 'n', keys = '<C-w>gf', desc = 'new tab → file' },
+    -- { mode = 'n', keys = '<C-w>gF', desc = 'new tab → file+jump' },
+    -- { mode = 'n', keys = '<C-w>d', desc = 'split → def' },
+    -- { mode = 'n', keys = '<C-w>i', desc = 'split → declaration' },
+    --
+    -- -- Miscellaneous (less commonly used)
+    -- { mode = 'n', keys = '<C-w>^', desc = 'split → alt file' },
+    -- { mode = 'n', keys = '<C-w>b', desc = 'focus bottom', postkeys = postkeys_navigate },
+    -- { mode = 'n', keys = '<C-w>t', desc = 'focus top', postkeys = postkeys_navigate },
+    -- { mode = 'n', keys = '<C-w>P', desc = 'focus preview', postkeys = postkeys_navigate },
+    -- { mode = 'n', keys = '<C-w>g', desc = 'extra actions' },
+}
+
+NoPain.clues_register = {
+    { next_key = '"', desc = 'Default reg'},
+    { next_key = '0', desc = 'Last yank'},
+    { next_key = '+', desc = 'Sys clipboard'},
+    { next_key = '1', desc = 'Last big del'},
+    { next_key = '-', desc = 'Last small del'},
+    -- { next_key = '.', desc = 'Last insert'},
+    { next_key = '/', desc = 'Last search'},
+    -- { next_key = ':', desc = 'Last command'},
+    { next_key = '*', desc = 'Sel clipboard'},
+    -- { next_key = '#', desc = 'Alt buffer'},
+    -- { next_key = '％',desc =  'Current file'},
+    -- { next_key = '=', desc = 'Expr result'},
+    { next_key = '_', desc = 'Black hole'},
+}
 
 ---- Define a function to check the mode and change statusline according to mode
 NoPain.change_statusline_by_mode = function()
@@ -77,15 +166,16 @@ NoPain.change_statusline_by_mode = function()
         -- Echo "Hello" in the command line
         -- vim.api.nvim_command('echo "Hello"')
         NoPain.normal_primary = "#98C066"
-        vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_normal)
+        vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_normal, "")
     elseif current_mode == "i" then
         NoPain.normal_primary = "#50B2F0"
-        vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_insert)
+        vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_insert, "📝")
     elseif current_mode == "v" then
         NoPain.normal_primary = "#F0B100"
-        vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_visual)
+        vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_visual, "👁")
     end
 end
+
 
 NoPain.setup = function(config)
     -- Export module
@@ -104,7 +194,7 @@ NoPain.setup = function(config)
     H.create_default_hl()
 
     NoPain.normal_primary = "#98C066"
-    vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_normal)
+    vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_normal, "")
 
     -- Set up an autocommand to call the function whenever the mode changes
     vim.api.nvim_create_autocmd('ModeChanged', {
@@ -121,7 +211,37 @@ NoPain.config = {
 
     -- Array of opt-in triggers which start custom key query process.
     -- **Needs to have something in order to show clues**.
-    triggers = {},
+    triggers = {
+        -- Leader triggers
+        { mode = 'n', keys = '\\' },
+        { mode = 'x', keys = '\\' },
+
+        -- Built-in completion
+        { mode = 'i', keys = '<C-x>' },
+
+        -- `g` key
+        -- { mode = 'n', keys = 'g' },
+        -- { mode = 'x', keys = 'g' },
+
+        -- Marks
+        { mode = 'n', keys = "'" },
+        { mode = 'n', keys = '`' },
+        { mode = 'x', keys = "'" },
+        { mode = 'x', keys = '`' },
+
+        -- Registers
+        { mode = 'n', keys = '"' },
+        { mode = 'x', keys = '"' },
+        { mode = 'i', keys = '<C-r>' },
+        { mode = 'c', keys = '<C-r>' },
+
+        -- Window commands
+        { mode = 'n', keys = '<C-w>' },
+
+        -- `z` key
+        { mode = 'n', keys = 'z' },
+        { mode = 'x', keys = 'z' },
+    },
 
     -- Clue window settings
     window = {
@@ -135,7 +255,7 @@ NoPain.config = {
         scroll_down = '<C-d>',
         scroll_up = '<C-u>',
     },
-}  
+}
 
 NoPain.enable_all_triggers = function()
     for _, buf_id in ipairs(vim.api.nvim_list_bufs()) do
@@ -193,25 +313,23 @@ end
 NoPain.gen_clues = {}
 
 NoPain.gen_clues.builtin_completion = function()
+
     --stylua: ignore
     return {
-        { mode = 'i', keys = '<C-x><C-d>', desc = 'Defined identifiers' },
-        { mode = 'i', keys = '<C-x><C-e>', desc = 'Scroll ↑' },
-        { mode = 'i', keys = '<C-x><C-f>', desc = 'File names' },
-        { mode = 'i', keys = '<C-x><C-i>', desc = 'Identifiers' },
-        { mode = 'i', keys = '<C-x><C-k>', desc = 'dict Identifiers' },
-        { mode = 'i', keys = '<C-x><C-l>', desc = 'Whole lines' },
-        { mode = 'i', keys = '<C-x><C-n>', desc = 'Next' },
-        { mode = 'i', keys = '<C-x><C-o>', desc = 'Omni' },
-        { mode = 'i', keys = '<C-x><C-p>', desc = 'Prev' },
-        { mode = 'i', keys = '<C-x><C-s>', desc = 'Spell' },
-        { mode = 'i', keys = '<C-x><C-t>', desc = 'Thesaurus Idnentifiers' },
-        { mode = 'i', keys = '<C-x><C-y>', desc = 'Scroll ↓' },
-        { mode = 'i', keys = '<C-x><C-u>', desc = "'completefunc'" },
-        { mode = 'i', keys = '<C-x><C-v>', desc = 'Cmd-line' },
-        { mode = 'i', keys = '<C-x><C-z>', desc = 'Stop' },
-        { mode = 'i', keys = '<C-x><C-]>', desc = 'Tags' },
-        { mode = 'i', keys = '<C-x>s',     desc = 'Spell' },
+        { mode = 'i', keys = '<C-x><C-n>', desc = 'Next' },               -- Next completion (very common)
+        { mode = 'i', keys = '<C-x><C-p>', desc = 'Prev' },               -- Previous completion (very common)
+        { mode = 'i', keys = '<C-x><C-f>', desc = 'File names' },         -- File path completion (useful in many contexts)
+        { mode = 'i', keys = '<C-x><C-l>', desc = 'Whole lines' },        -- Line completion (useful for repetitive text)
+        { mode = 'i', keys = '<C-x><C-o>', desc = 'Omni' },               -- Omni completion (language-specific, very powerful)
+        { mode = 'i', keys = '<C-x><C-k>', desc = 'dict Identifiers' },   -- Dictionary completion (useful for writing)
+        { mode = 'i', keys = '<C-x><C-s>', desc = 'Spell' },              -- Spell checking (important for writing)
+        { mode = 'i', keys = '<C-x>s',     desc = 'Spell' },              -- Alternative spell checking
+        -- { mode = 'i', keys = '<C-x><C-i>', desc = 'Identifiers' },        -- Identifier completion (useful for coding)
+        -- { mode = 'i', keys = '<C-x><C-]>', desc = 'Tags' },               -- Tag completion (useful for coding)
+        -- { mode = 'i', keys = '<C-x><C-d>', desc = 'Defined identifiers' },-- Defined identifiers (useful for coding)
+        -- { mode = 'i', keys = '<C-x><C-t>', desc = 'Thesaurus Identifiers' },-- Thesaurus (useful for writing)
+        -- { mode = 'i', keys = '<C-x><C-u>', desc = "'completefunc'" },     -- Custom completion (advanced use)
+        -- { mode = 'i', keys = '<C-x><C-v>', desc = 'Cmd-line' },           -- Command-line completion (less common in text editing)
     }
 end
 
@@ -299,22 +417,23 @@ NoPain.gen_clues.g = function()
   end
 
 NoPain.gen_clues.marks = function()
+
     local describe_marks = function(mode, prefix)
         local make_clue = function(register, desc) return { mode = mode, keys = prefix .. register, desc = desc } end
         return {
-            make_clue('^', 'Latest insert'),
-            make_clue('.', 'Latest change'),
+            make_clue('^', 'Last insert'),
+            make_clue('.', 'Last change'),
             make_clue('"', 'Last exit'),
             make_clue("'", 'Prev line'),
             make_clue('`', 'Prev position'),
             make_clue('[', 'Start change/yank'),
             make_clue(']', 'End change/yank'),
-            make_clue('(', 'Start sentence'),
-            make_clue(')', 'End sentence'),
-            make_clue('{', 'Start paragraph'),
-            make_clue('}', 'End paragraph'),
-            make_clue('<', 'Start visual'),
-            make_clue('>', 'End visual'),
+            -- make_clue('(', 'Start sentence'),
+            -- make_clue(')', 'End sentence'),
+            -- make_clue('{', 'Start paragraph'),
+            -- make_clue('}', 'End paragraph'),
+            -- make_clue('<', 'Start visual'),
+            -- make_clue('>', 'End visual'),
         }
     end
 
@@ -403,110 +522,173 @@ NoPain.gen_clues.windows = function(opts)
 
     --stylua: ignore
     return {
+        -- Navigation (most frequently used)
+        { mode = 'n', keys = '<C-w>h', desc = 'focus left', postkeys = postkeys_navigate },
+        { mode = 'n', keys = '<C-w>j', desc = 'focus down', postkeys = postkeys_navigate },
+        { mode = 'n', keys = '<C-w>k', desc = 'focus up', postkeys = postkeys_navigate },
+        { mode = 'n', keys = '<C-w>l', desc = 'focus right', postkeys = postkeys_navigate },
+        { mode = 'n', keys = '<C-w>w', desc = 'focus next', postkeys = postkeys_navigate },
+        { mode = 'n', keys = '<C-w>W', desc = 'focus prev', postkeys = postkeys_navigate },
+        { mode = 'n', keys = '<C-w>p', desc = 'focus last', postkeys = postkeys_navigate },
+
+        -- Splitting windows (essential for multitasking)
+        { mode = 'n', keys = '<C-w>s', desc = 'split horizontal' },
+        { mode = 'n', keys = '<C-w>v', desc = 'split vertical' },
+        { mode = 'n', keys = '<C-w>n', desc = 'open new' },
+
+        -- Resizing windows (common for adjusting layout)
         { mode = 'n', keys = '<C-w>+', desc = '+height', postkeys = postkeys_resize },
         { mode = 'n', keys = '<C-w>-', desc = '-height', postkeys = postkeys_resize },
-        { mode = 'n', keys = '<C-w><', desc = '-width', postkeys = postkeys_resize },
         { mode = 'n', keys = '<C-w>>', desc = '+width', postkeys = postkeys_resize },
+        { mode = 'n', keys = '<C-w><', desc = '-width', postkeys = postkeys_resize },
         { mode = 'n', keys = '<C-w>=', desc = 'same size' },
-        { mode = 'n', keys = '<C-w>]', desc = 'split → tag' },
-        { mode = 'n', keys = '<C-w>^', desc = 'split → alt file' },
         { mode = 'n', keys = '<C-w>_', desc = 'set height' },
         { mode = 'n', keys = '<C-w>|', desc = 'set width' },
-        { mode = 'n', keys = '<C-w>}', desc = 'preview tag' },
-        { mode = 'n', keys = '<C-w>b', desc = 'focus bottom', postkeys = postkeys_navigate },
+
+        -- Closing and quitting (essential for cleanup)
         { mode = 'n', keys = '<C-w>c', desc = 'close' },
-        { mode = 'n', keys = '<C-w>d', desc = 'split → def' },
-        { mode = 'n', keys = '<C-w>F', desc = 'split → edit+jump' },
-        { mode = 'n', keys = '<C-w>f', desc = 'split → name+jump' },
-        { mode = 'n', keys = '<C-w>g', desc = 'extra actions' },
+        { mode = 'n', keys = '<C-w>q', desc = 'quit' },
+        { mode = 'n', keys = '<C-w>o', desc = 'close others' },
+        { mode = 'n', keys = '<C-w>z', desc = 'close preview' },
+
+        -- Moving and rotating windows (useful for rearranging)
+        { mode = 'n', keys = '<C-w>H', desc = 'move leftmost', postkeys = postkeys_move },
+        { mode = 'n', keys = '<C-w>J', desc = 'move bottommost', postkeys = postkeys_move },
+        { mode = 'n', keys = '<C-w>K', desc = 'move topmost', postkeys = postkeys_move },
+        { mode = 'n', keys = '<C-w>L', desc = 'move rightmost', postkeys = postkeys_move },
+        { mode = 'n', keys = '<C-w>x', desc = 'swap windows', postkeys = postkeys_move },
+        { mode = 'n', keys = '<C-w>r', desc = 'rotate ↓/→', postkeys = postkeys_move },
+        { mode = 'n', keys = '<C-w>R', desc = 'rotate ↑/←', postkeys = postkeys_move },
+
+        -- Tab management (useful for multitasking)
+        { mode = 'n', keys = '<C-w>T', desc = 'move to new tab' },
+        { mode = 'n', keys = '<C-w>gt', desc = 'focus next tab', postkeys = postkeys_navigate },
+        { mode = 'n', keys = '<C-w>gT', desc = 'focus prev tab', postkeys = postkeys_navigate },
+        { mode = 'n', keys = '<C-w>g<Tab>', desc = 'focus last tab', postkeys = postkeys_navigate },
+
+        -- Tag and file navigation (useful for coding)
+        { mode = 'n', keys = '<C-w>]', desc = 'split → tag' },
+        { mode = 'n', keys = '<C-w>}', desc = 'preview tag' },
         { mode = 'n', keys = '<C-w>g]', desc = 'split → tag list' },
         { mode = 'n', keys = '<C-w>g}', desc = ':ptjump' },
         { mode = 'n', keys = '<C-w>g<C-]>', desc = 'split → :tjump' },
-        { mode = 'n', keys = '<C-w>g<Tab>', desc = 'focus last tab', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>gF', desc = 'new tab → file+jump' },
+        { mode = 'n', keys = '<C-w>f', desc = 'split → name+jump' },
+        { mode = 'n', keys = '<C-w>F', desc = 'split → edit+jump' },
         { mode = 'n', keys = '<C-w>gf', desc = 'new tab → file' },
-        { mode = 'n', keys = '<C-w>gT', desc = 'focus prev tab', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>gt', desc = 'focus next tab', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>H', desc = 'move leftmost', postkeys = postkeys_move },
-        { mode = 'n', keys = '<C-w>h', desc = 'focus left', postkeys = postkeys_navigate },
+        { mode = 'n', keys = '<C-w>gF', desc = 'new tab → file+jump' },
+        { mode = 'n', keys = '<C-w>d', desc = 'split → def' },
         { mode = 'n', keys = '<C-w>i', desc = 'split → declaration' },
-        { mode = 'n', keys = '<C-w>J', desc = 'move bottommost', postkeys = postkeys_move },
-        { mode = 'n', keys = '<C-w>j', desc = 'focus down', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>K', desc = 'move topmost', postkeys = postkeys_move },
-        { mode = 'n', keys = '<C-w>k', desc = 'focus up', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>L', desc = 'move rightmost', postkeys = postkeys_move },
-        { mode = 'n', keys = '<C-w>l', desc = 'focus right', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>n', desc = 'open new' },
-        { mode = 'n', keys = '<C-w>o', desc = 'close others' },
-        { mode = 'n', keys = '<C-w>P', desc = 'focus preview', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>p', desc = 'focus last', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>q', desc = 'quit' },
-        { mode = 'n', keys = '<C-w>R', desc = 'rotate ↑/←', postkeys = postkeys_move },
-        { mode = 'n', keys = '<C-w>r', desc = 'rotate ↓/→', postkeys = postkeys_move },
-        { mode = 'n', keys = '<C-w>s', desc = 'split horizontal' },
-        { mode = 'n', keys = '<C-w>T', desc = 'move to new tab' },
+
+        -- Miscellaneous (less commonly used)
+        { mode = 'n', keys = '<C-w>^', desc = 'split → alt file' },
+        { mode = 'n', keys = '<C-w>b', desc = 'focus bottom', postkeys = postkeys_navigate },
         { mode = 'n', keys = '<C-w>t', desc = 'focus top', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>v', desc = 'split vertical' },
-        { mode = 'n', keys = '<C-w>W', desc = 'focus prev', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>w', desc = 'focus next', postkeys = postkeys_navigate },
-        { mode = 'n', keys = '<C-w>x', desc = 'swap windows', postkeys = postkeys_move },
-        { mode = 'n', keys = '<C-w>z', desc = 'close preview' },
+        { mode = 'n', keys = '<C-w>P', desc = 'focus preview', postkeys = postkeys_navigate },
+        { mode = 'n', keys = '<C-w>g', desc = 'extra actions' },
     }
 end
 
 NoPain.gen_clues.z = function()
     --stylua: ignore
     return {
+        -- Screen navigation
+        { mode = 'n', keys = 'zz', desc = 'Center cursor' },
+        { mode = 'n', keys = 'zt', desc = 'Cursor to top' },
+        { mode = 'n', keys = 'zb', desc = 'Cursor to bottom' },
+
+        -- Folding
+        { mode = 'n', keys = 'za', desc = 'Toggle fold' },
         { mode = 'n', keys = 'zA', desc = 'Toggle folds (rec)' },
-    { mode = 'n', keys = 'za', desc = 'Toggle fold' },
-    { mode = 'n', keys = 'zb', desc = 'Redraw bottom' },
-    { mode = 'n', keys = 'zC', desc = 'Close folds (rec)' },
-    { mode = 'n', keys = 'zc', desc = 'Close fold' },
-    { mode = 'n', keys = 'zD', desc = 'Delete folds (rec)' },
-    { mode = 'n', keys = 'zd', desc = 'Delete fold' },
-    { mode = 'n', keys = 'zE', desc = 'Eliminate folds' },
-    { mode = 'n', keys = 'ze', desc = 'Move cursor right' },
-    { mode = 'n', keys = 'zF', desc = 'Create fold' },
-    { mode = 'n', keys = 'zf', desc = 'Create fold (op)' },
-    { mode = 'n', keys = 'zG', desc = 'Temp mark as correct' },
-    { mode = 'n', keys = 'zg', desc = 'Perm mark as correct' },
-    { mode = 'n', keys = 'zH', desc = 'Scroll left (½)' },
-    { mode = 'n', keys = 'zh', desc = 'Scroll left' },
-    { mode = 'n', keys = 'zi', desc = "Toggle 'foldenable'" },
-    { mode = 'n', keys = 'zj', desc = 'Next fold start' },
-    { mode = 'n', keys = 'zk', desc = 'Prev fold end' },
-    { mode = 'n', keys = 'zL', desc = 'Scroll right (½)' },
-    { mode = 'n', keys = 'zl', desc = 'Scroll right' },
-    { mode = 'n', keys = 'zM', desc = 'Close all folds' },
-    { mode = 'n', keys = 'zm', desc = 'Fold more' },
-    { mode = 'n', keys = 'zN', desc = "Enable 'foldenable'" },
-    { mode = 'n', keys = 'zn', desc = "Reset 'foldenable'" },
-    { mode = 'n', keys = 'zO', desc = 'Open folds (rec)' },
-    { mode = 'n', keys = 'zo', desc = 'Open fold' },
-    { mode = 'n', keys = 'zP', desc = 'Paste (no trail)' },
-    { mode = 'n', keys = 'zp', desc = 'Paste (no trail)' },
-    { mode = 'n', keys = 'zR', desc = 'Open all folds' },
-    { mode = 'n', keys = 'zr', desc = 'Fold less' },
-    { mode = 'n', keys = 'zs', desc = 'Scroll cursor left' },
-    { mode = 'n', keys = 'zt', desc = 'Redraw top' },
-    { mode = 'n', keys = 'zu', desc = 'Undo spelling' },
-    { mode = 'n', keys = 'zug', desc = 'Undo `zg`' },
-    { mode = 'n', keys = 'zuG', desc = 'Undo `zG`' },
-    { mode = 'n', keys = 'zuw', desc = 'Undo `zw`' },
-    { mode = 'n', keys = 'zuW', desc = 'Undo `zW`' },
-    { mode = 'n', keys = 'zv', desc = 'Open enough folds' },
-    { mode = 'n', keys = 'zW', desc = 'Temp mark as wrong' },
-    { mode = 'n', keys = 'zw', desc = 'Perm mark as wrong' },
-    { mode = 'n', keys = 'zX', desc = 'Update folds' },
-    { mode = 'n', keys = 'zx', desc = 'Update + open folds' },
-    { mode = 'n', keys = 'zy', desc = 'Yank (no trail) (op)' },
-    { mode = 'n', keys = 'zz', desc = 'Redraw center' },
-    { mode = 'n', keys = 'z+', desc = 'Redraw under top' },
-    { mode = 'n', keys = 'z-', desc = 'Redraw bottom' },
-    { mode = 'n', keys = 'z.', desc = 'Redraw center' },
-    { mode = 'n', keys = 'z=', desc = 'Spelling suggest' },
-    { mode = 'n', keys = 'z^', desc = 'Redraw above' },
-    { mode = 'x', keys = 'zf', desc = 'Fold selection' },
+        { mode = 'n', keys = 'zo', desc = 'Open fold' },
+        { mode = 'n', keys = 'zO', desc = 'Open folds (rec)' },
+        -- { mode = 'n', keys = 'zc', desc = 'Close fold' },
+        -- { mode = 'n', keys = 'zC', desc = 'Close folds (rec)' },
+        -- { mode = 'n', keys = 'zv', desc = 'Open folds for cursor' },
+        -- { mode = 'n', keys = 'zR', desc = 'Open all folds' },
+        -- { mode = 'n', keys = 'zM', desc = 'Close all folds' },
+        -- { mode = 'n', keys = 'zi', desc = 'Toggle folding' },
+        --
+        -- -- Scrolling
+        -- { mode = 'n', keys = 'zh', desc = 'Scroll left' },
+        -- { mode = 'n', keys = 'zH', desc = 'Scroll left (½)' },
+        -- { mode = 'n', keys = 'zl', desc = 'Scroll right' },
+        -- { mode = 'n', keys = 'zL', desc = 'Scroll right (½)' },
+        --
+        -- -- Spelling
+        -- { mode = 'n', keys = 'z=', desc = 'Spelling suggest' },
+        -- { mode = 'n', keys = 'zg', desc = 'Mark correct' },
+        -- { mode = 'n', keys = 'zw', desc = 'Mark wrong' },
+        -- { mode = 'n', keys = 'zu', desc = 'Undo spelling' },
+        --
+        -- -- Fold operations
+        -- { mode = 'n', keys = 'zf', desc = 'Create fold (op)' },
+        -- { mode = 'x', keys = 'zf', desc = 'Fold selection' },
+        -- { mode = 'n', keys = 'zF', desc = 'Create fold' },
+        -- { mode = 'n', keys = 'zd', desc = 'Delete fold' },
+        -- { mode = 'n', keys = 'zD', desc = 'Delete folds (rec)' },
+        --
+        -- -- Miscellaneous
+        -- { mode = 'n', keys = 'zm', desc = 'Fold more' },
+        -- { mode = 'n', keys = 'zr', desc = 'Fold less' },
+        -- { mode = 'n', keys = 'zP', desc = 'Paste (no trail)' },
+        -- { mode = 'n', keys = 'zp', desc = 'Paste (no trail)' },
+        -- { mode = 'n', keys = 'zy', desc = 'Yank (no trail)' },
+    }
+end
+
+NoPain.gen_clues.insert = function()
+    --stylua: ignore
+    return {
+        { mode = 'n', keys = 'iA', desc = 'Toggle folds (rec)' },
+    { mode = 'n', keys = 'ia', desc = 'Toggle fold' },
+    { mode = 'n', keys = 'ib', desc = 'Redraw bottom' },
+    { mode = 'n', keys = 'iC', desc = 'Close folds (rec)' },
+    { mode = 'n', keys = 'ic', desc = 'Close fold' },
+    { mode = 'n', keys = 'iD', desc = 'Delete folds (rec)' },
+    { mode = 'n', keys = 'id', desc = 'Delete fold' },
+    { mode = 'n', keys = 'iE', desc = 'Eliminate folds' },
+    { mode = 'n', keys = 'ie', desc = 'Move cursor right' },
+    { mode = 'n', keys = 'iF', desc = 'Create fold' },
+    { mode = 'n', keys = 'if', desc = 'Create fold (op)' },
+    { mode = 'n', keys = 'iG', desc = 'Temp mark as correct' },
+    { mode = 'n', keys = 'ig', desc = 'Perm mark as correct' },
+    { mode = 'n', keys = 'iH', desc = 'Scroll left (½)' },
+    { mode = 'n', keys = 'ih', desc = 'Scroll left' },
+    { mode = 'n', keys = 'ii', desc = "Toggle 'foldenable'" },
+    { mode = 'n', keys = 'ij', desc = 'Next fold start' },
+    { mode = 'n', keys = 'ik', desc = 'Prev fold end' },
+    { mode = 'n', keys = 'iL', desc = 'Scroll right (½)' },
+    { mode = 'n', keys = 'il', desc = 'Scroll right' },
+    { mode = 'n', keys = 'iM', desc = 'Close all folds' },
+    { mode = 'n', keys = 'im', desc = 'Fold more' },
+    { mode = 'n', keys = 'iN', desc = "Enable 'foldenable'" },
+    { mode = 'n', keys = 'in', desc = "Reset 'foldenable'" },
+    { mode = 'n', keys = 'iO', desc = 'Open folds (rec)' },
+    { mode = 'n', keys = 'io', desc = 'Open fold' },
+    { mode = 'n', keys = 'iP', desc = 'Paste (no trail)' },
+    { mode = 'n', keys = 'ip', desc = 'Paste (no trail)' },
+    { mode = 'n', keys = 'iR', desc = 'Open all folds' },
+    { mode = 'n', keys = 'ir', desc = 'Fold less' },
+    { mode = 'n', keys = 'is', desc = 'Scroll cursor left' },
+    { mode = 'n', keys = 'it', desc = 'Redraw top' },
+    { mode = 'n', keys = 'iu', desc = 'Undo spelling' },
+    { mode = 'n', keys = 'iug', desc = 'Undo `zg`' },
+    { mode = 'n', keys = 'iuG', desc = 'Undo `zG`' },
+    { mode = 'n', keys = 'iuw', desc = 'Undo `zw`' },
+    { mode = 'n', keys = 'iuW', desc = 'Undo `zW`' },
+    { mode = 'n', keys = 'iv', desc = 'Open enough folds' },
+    { mode = 'n', keys = 'iW', desc = 'Temp mark as wrong' },
+    { mode = 'n', keys = 'iw', desc = 'Perm mark as wrong' },
+    { mode = 'n', keys = 'iX', desc = 'Update folds' },
+    { mode = 'n', keys = 'ix', desc = 'Update + open folds' },
+    { mode = 'n', keys = 'iy', desc = 'Yank (no trail) (op)' },
+    { mode = 'n', keys = 'iz', desc = 'Redraw center' },
+    { mode = 'n', keys = 'i+', desc = 'Redraw under top' },
+    { mode = 'n', keys = 'i-', desc = 'Redraw bottom' },
+    { mode = 'n', keys = 'i.', desc = 'Redraw center' },
+    { mode = 'n', keys = 'i=', desc = 'Spelling suggest' },
+    { mode = 'n', keys = 'i^', desc = 'Redraw above' },
+    { mode = 'x', keys = 'if', desc = 'Fold selection' },
     }
 end
 
@@ -957,6 +1139,43 @@ H.window_update = vim.schedule_wrap(function()
     -- Gather the clue content
     local keys = H.query_to_keys(H.state.query)
     local content = H.clues_to_buffer_content(H.state.clues, keys)
+    -- vim.opt.statusline = vim.inspect(keys)
+
+    -- Define a lookup table for cases
+    local switch = {
+        ["\18"] = function()
+            NoPain.normal_primary = "#E15250"
+            vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_register, '"📋')
+        end,
+        ['"'] = function()
+            NoPain.normal_primary = "#E15250"
+            vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_register, '"📋')
+        end,
+        ["\23"] = function()
+            NoPain.normal_primary = "#AA8DEC"
+            vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_windows, "🖥️")
+        end,
+        ["\24"] = function()
+            NoPain.normal_primary = "#DE753E"
+            vim.opt.statusline = NoPain.create_clues_bar(NoPain.clues_builtin_completion, "💡")
+        end,
+        ["`"] = function()
+            NoPain.normal_primary = "#CD9546"
+            vim.opt.statusline = NoPain.create_clues_bar(content, "")
+        end,
+        ["'"] = function()
+            NoPain.normal_primary = "#CD9546"
+            vim.opt.statusline = NoPain.create_clues_bar(content, "")
+        end,
+        ["z"] = function()
+            NoPain.normal_primary = "#C67089"
+            vim.opt.statusline = NoPain.create_clues_bar(content, "⤵")
+        end,
+    }
+
+    -- Execute the corresponding function or default
+    local case = switch[keys]
+    case()
 
     -- Format the content for the status bar
 
@@ -975,12 +1194,39 @@ H.window_update = vim.schedule_wrap(function()
         orange = "#FEFEFE"
     }
 
+    -- local highlights = {
+    --     { "Arrow",  { fg = nopain_secondary, bg = nopain_font, bold = true } },
+    --     { "NKey",   { fg = nopain_keyfont, bg = nopain_font, bold = true } },
+    --     { "IArrow", { fg = nopain_font, bg = nopain_secondary, bold = true } },
+    --     { "Label",  { fg = nopain_font, bg = nopain_secondary,  bold = true } },
+    --     { "WLabel", { fg = "#3B4252", bg = nopain_secondary,  bold = true } },
+    --     { "WKey",   { fg = nopain_secondary, bg = nopain_secondary,  bold = true } },
+    --     { "Key",    { fg = nopain_secondary, bg = nopain_secondary,  bold = true } },
+    -- }
+    --
+    -- for _, hl in ipairs(highlights) do
+    --     vim.api.nvim_set_hl(0, hl[1], hl[2])
+    -- end
+      
 --label gui bg is behind the description
 -- Arrow is the color of arrow after description
 -- arrow is bg after w-key mai shai sam liam 
 --  I Pai forgroundcolor of label it should effect arrow color bro 
+ --    local clues_str = ""
+ --    local first = true
+ --    for _, line_content in ipairs(content) do
+ --        if first then
+ --            -- Do something special for the first pair
+ --            clues_str = clues_str .. string.format("test")
+ -- -- Example prefix
+ --            first = false  -- Mark as not first anymore
+ --        end
+ --        clues_str = clues_str .. string.format("%s%s%s %s %s%s%s %s",
+ --            "%#Arrow#", "", "%#NKey#", line_content.next_key, "%#IArrow#", "", "%#Label#",
+ --            line_content.desc)
+ --    end
     -- Update the status bar with the clues
-    vim.opt.statusline = NoPain.create_clues_bar(content)
+    -- vim.opt.statusline = NoPain.create_clues_bar(content)
 end)
 
 H.window_scroll = function(is_scroll_down)
@@ -1392,4 +1638,3 @@ end
 H.islist = vim.fn.has('nvim-0.10') == 1 and vim.islist or vim.tbl_islist
 
 return NoPain
-
